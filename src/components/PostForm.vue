@@ -2,29 +2,49 @@
   <form @submit.prevent>
     <h4>Create Post</h4>
     <input
-      v-bind:value="title"
-      @input="title = $event.target.value"
+      v-model="post.title"
       class="input"
       type="text"
       placeholder="Post name ..."
     />
     <input
-      v-bind:value="body"
-      @input="body = $event.target.value"
+      v-model="post.body"
       class="input"
       type="text"
       placeholder="Post description ..."
     />
-    <button @click="createPost">Save Post</button>
+    <button @click="createPost">Create Post</button>
   </form>
 </template>
 
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      post: {
+        id: null,
+        title: "",
+        body: "",
+      },
+    };
+  },
+  methods: {
+    createPost() {
+      if (!this.post.title || !this.post.body) {
+        return;
+      }
+      this.post.id = Date.now();
+      this.$emit("create", this.post);
+      this.post = {
+        title: "",
+        body: "",
+      };
+    },
+  },
+};
 </script>
 
 <style scoped>
-
 form {
   display: flex;
   flex-direction: column;
@@ -33,7 +53,7 @@ form {
 
 form button {
   cursor: pointer;
-  width: 100px;
+  width: 150px;
   padding: 10px;
   outline: none;
   border: 2px solid teal;
@@ -49,5 +69,4 @@ form button {
   padding: 10px 15px;
   margin-top: 15px;
 }
-
 </style>
