@@ -13,7 +13,7 @@
       type="text"
       placeholder="Post description ..."
     />
-    <button @click="createPost">Create Post</button>
+    <my-button @click="createPost">Create Post</my-button>
   </form>
 </template>
 
@@ -49,18 +49,6 @@ form {
   display: flex;
   flex-direction: column;
   gap: 15px;
-}
-
-form button {
-  cursor: pointer;
-  width: 150px;
-  padding: 10px;
-  outline: none;
-  border: 2px solid teal;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: bold;
-  background: none;
 }
 
 .input {
