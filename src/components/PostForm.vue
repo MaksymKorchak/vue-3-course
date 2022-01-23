@@ -1,15 +1,13 @@
 <template>
   <form @submit.prevent>
     <h4>Create Post</h4>
-    <input
+    <my-input
       v-model="post.title"
-      class="input"
       type="text"
       placeholder="Post name ..."
     />
-    <input
+    <my-input
       v-model="post.body"
-      class="input"
       type="text"
       placeholder="Post description ..."
     />
@@ -51,10 +49,4 @@ form {
   gap: 15px;
 }
 
-.input {
-  width: 50%;
-  border: 1px solid teal;
-  padding: 10px 15px;
-  margin-top: 15px;
-}
 </style>
