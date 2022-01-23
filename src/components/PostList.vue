@@ -1,8 +1,14 @@
 <template>
-  <div>
+  <div v-if="posts.length > 0">
     <h3>List</h3>
-    <post-item v-for="post in posts" :key="post.id" :post="post"/>
+    <post-item v-for="post in posts" 
+    :key="post.id" 
+    :post="post" 
+    @remove = "$emit('remove',post)"/>
   </div>
+  <h3 v-else>
+      There is no Items in the List ;(
+  </h3>
 </template>
 
 <script>
@@ -20,10 +26,8 @@ export default {
 </script>
 
 <style scoped>
-
 h3 {
   padding: 15px 0;
   font-weight: bold;
 }
-
 </style>
