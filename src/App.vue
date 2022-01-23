@@ -19,9 +19,12 @@
       @remove="removePost"
     />
     <h3 v-else>Loading ...</h3>
-    <div class="page__wrapper">
+    <div ref="observer" class="observer"></div>
+
+    <!-- Page pagination for clicking -->
+    <!-- <div class="page__wrapper">
 		<my-pagination-item :totalPages="totalPages" :page="page" @changePage="changePage"/>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -30,7 +33,7 @@ import PostForm from "./components/PostForm.vue";
 import PostList from "./components/PostList.vue";
 import MyButton from "./components/UI/MyButton.vue";
 import axios from "axios";
-import MyPaginationItem from './components/UI/MyPaginationItem.vue';
+import MyPaginationItem from "./components/UI/MyPaginationItem.vue";
 
 export default {
   components: {
@@ -99,13 +102,49 @@ export default {
       }
     },
 
-    changePage(pageNumber) {
-      this.page = pageNumber;
+    async loadMorePosts() {
+      try {
+        this.page += 1;
+        const response = await axios.get(
+          "https:jsonplaceholder.typicode.com/posts",
+          {
+            params: {
+              _page: this.page,
+              _limit: this.limit,
+            },
+          }
+        );
+        this.totalPages = Math.ceil(
+          response.headers["x-total-count"] / this.limit
+        );
+        this.posts = [...this.posts, ...response.data];
+      } catch (e) {
+        console.log(e.message);
+      }
     },
+
+    // changePage(pageNumber) {
+    //   this.page = pageNumber;
+    // },
   },
 
   mounted() {
     this.fetchPosts();
+
+    //Dynamic pagination.
+    const options = {
+      rootMargin: "0px",
+      threshold: 1.0,
+    };
+
+    const callback = (entries, observer) => {
+      if (entries[0].isIntersecting && this.page < this.totalPages) {
+        this.loadMorePosts();
+      }
+    };
+
+    const observer = new IntersectionObserver(callback, options);
+    observer.observe(this.$refs.observer);
   },
 
   computed: {
@@ -122,9 +161,9 @@ export default {
   },
 
   watch: {
-    page() {
-      this.fetchPosts();
-    },
+    // page() {
+    //   this.fetchPosts();
+    // },
   },
 };
 </script>
@@ -158,5 +197,10 @@ h3 {
   margin: 15px 0;
 }
 
-
+.observer {
+  height: 20px;
+  background: transparent;
+  opacity: 50%;
+  margin: 15px 0;
+}
 </style>
