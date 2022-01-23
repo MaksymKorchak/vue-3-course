@@ -1,7 +1,11 @@
 <template>
   <div class="app">
     <h1>Page with posts</h1>
-    <my-input v-model="searchQuery" placeholder="Search by ..." style="margin-bottom:15px"/>
+    <my-input
+      v-model="searchQuery"
+      placeholder="Search by ..."
+      style="margin-bottom: 15px"
+    />
     <div class="app__btns">
       <my-button @click="showDialog">Create new Post</my-button>
       <my-select v-model="selectedSort" :options="sortOptions" />
@@ -15,6 +19,9 @@
       @remove="removePost"
     />
     <h3 v-else>Loading ...</h3>
+    <div class="page__wrapper">
+		<my-pagination-item :totalPages="totalPages" :page="page" @changePage="changePage"/>
+    </div>
   </div>
 </template>
 
@@ -23,12 +30,14 @@ import PostForm from "./components/PostForm.vue";
 import PostList from "./components/PostList.vue";
 import MyButton from "./components/UI/MyButton.vue";
 import axios from "axios";
+import MyPaginationItem from './components/UI/MyPaginationItem.vue';
 
 export default {
   components: {
     PostForm,
     PostList,
     MyButton,
+    MyPaginationItem,
   },
 
   data() {
@@ -38,6 +47,9 @@ export default {
       isPostsLoading: false,
       selectedSort: "",
       searchQuery: "",
+      page: 1,
+      limit: 10,
+      totalPages: 1,
       sortOptions: [
         {
           value: "title",
@@ -68,7 +80,16 @@ export default {
       try {
         this.isPostsLoading = true;
         const response = await axios.get(
-          "https:jsonplaceholder.typicode.com/posts?_limit=10"
+          "https:jsonplaceholder.typicode.com/posts",
+          {
+            params: {
+              _page: this.page,
+              _limit: this.limit,
+            },
+          }
+        );
+        this.totalPages = Math.ceil(
+          response.headers["x-total-count"] / this.limit
         );
         this.posts = response.data;
       } catch (e) {
@@ -76,6 +97,10 @@ export default {
       } finally {
         this.isPostsLoading = false;
       }
+    },
+
+    changePage(pageNumber) {
+      this.page = pageNumber;
     },
   },
 
@@ -96,11 +121,11 @@ export default {
     },
   },
 
-  //   watch: {
-  //     selectedSort(newValue) {
-  // 		this.posts.sort((post1,post2) => post1[newValue]?.localeCompare(post2[newValue]))
-  //     },
-  //   },
+  watch: {
+    page() {
+      this.fetchPosts();
+    },
+  },
 };
 </script>
 
@@ -126,5 +151,12 @@ h1,
 h3 {
   padding: 15px 0;
 }
+
+.page__wrapper {
+  display: flex;
+  gap: 5px;
+  margin: 15px 0;
+}
+
 
 </style>

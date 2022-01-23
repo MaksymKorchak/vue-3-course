@@ -1,11 +1,12 @@
 <template>
   <div class="post">
     <div>
+      <div>{{ post.id }}</div>
       <div><strong>Name: </strong>{{ post.title }}</div>
       <div><strong>Description: </strong>{{ post.body }}</div>
     </div>
     <div class="post-actions">
-      <my-button @click="$emit('remove',post)">Remove</my-button>
+      <my-button @click="$emit('remove', post)">Remove</my-button>
     </div>
   </div>
 </template>
@@ -30,5 +31,4 @@ export default {
   margin-top: 15px;
   border: 2px solid teal;
 }
-
 </style>
