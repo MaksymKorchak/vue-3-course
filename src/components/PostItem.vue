@@ -6,6 +6,7 @@
       <div><strong>Description: </strong>{{ post.body }}</div>
     </div>
     <div class="post-actions">
+      <my-button @click="$router.push(`/posts/${post.id}`)">Open</my-button>
       <my-button @click="$emit('remove', post)">Remove</my-button>
     </div>
   </div>
@@ -30,5 +31,12 @@ export default {
   padding: 15px;
   margin-top: 15px;
   border: 2px solid teal;
+}
+
+.post-actions {
+    min-width: 200px;
+    display: flex;
+    gap:5px;
+    flex-wrap: wrap;
 }
 </style>
