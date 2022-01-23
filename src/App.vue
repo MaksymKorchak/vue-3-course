@@ -1,6 +1,7 @@
 <template>
   <div class="app">
     <h1>Page with posts</h1>
+    <my-input v-model="searchQuery" placeholder="Search by ..." style="margin-bottom:15px"/>
     <div class="app__btns">
       <my-button @click="showDialog">Create new Post</my-button>
       <my-select v-model="selectedSort" :options="sortOptions" />
@@ -8,7 +9,11 @@
     <my-dialog v-model:showModal="modalVisible">
       <post-form @create="createPost" />
     </my-dialog>
-    <post-list v-if="!isPostsLoading" :posts="sortedPosts" @remove="removePost" />
+    <post-list
+      v-if="!isPostsLoading"
+      :posts="sortedAndSearchedPosts"
+      @remove="removePost"
+    />
     <h3 v-else>Loading ...</h3>
   </div>
 </template>
@@ -32,6 +37,7 @@ export default {
       modalVisible: false,
       isPostsLoading: false,
       selectedSort: "",
+      searchQuery: "",
       sortOptions: [
         {
           value: "title",
@@ -78,17 +84,23 @@ export default {
   },
 
   computed: {
-	  sortedPosts() {
-		  return [...this.posts].sort((post1,post2) => post1[this.selectedSort]?.localeCompare(post2[this.selectedSort]))
-	  }
+    sortedPosts() {
+      return [...this.posts].sort((post1, post2) =>
+        post1[this.selectedSort]?.localeCompare(post2[this.selectedSort])
+      );
+    },
+    sortedAndSearchedPosts() {
+      return this.sortedPosts.filter((post) =>
+        post.title.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
+    },
   },
 
-//   watch: {
-//     selectedSort(newValue) {
-// 		this.posts.sort((post1,post2) => post1[newValue]?.localeCompare(post2[newValue]))
-//     },
-//   },
-
+  //   watch: {
+  //     selectedSort(newValue) {
+  // 		this.posts.sort((post1,post2) => post1[newValue]?.localeCompare(post2[newValue]))
+  //     },
+  //   },
 };
 </script>
 
@@ -100,6 +112,8 @@ export default {
 }
 
 .app {
+  max-width: 900px;
+  margin: 0 auto;
   padding: 20px;
 }
 
@@ -112,4 +126,5 @@ h1,
 h3 {
   padding: 15px 0;
 }
+
 </style>
