@@ -1,11 +1,14 @@
 <template>
   <div class="app">
     <h1>Page with posts</h1>
-    <my-button @click="showDialog">Create new Post</my-button>
+    <div class="app__btns">
+      <my-button @click="showDialog">Create new Post</my-button>
+      <my-select v-model="selectedSort" :options="sortOptions" />
+    </div>
     <my-dialog v-model:showModal="modalVisible">
       <post-form @create="createPost" />
     </my-dialog>
-    <post-list v-if="!isPostsLoading" :posts="posts" @remove="removePost" />
+    <post-list v-if="!isPostsLoading" :posts="sortedPosts" @remove="removePost" />
     <h3 v-else>Loading ...</h3>
   </div>
 </template>
@@ -28,6 +31,17 @@ export default {
       posts: [],
       modalVisible: false,
       isPostsLoading: false,
+      selectedSort: "",
+      sortOptions: [
+        {
+          value: "title",
+          name: "By name",
+        },
+        {
+          value: "body",
+          name: "By description",
+        },
+      ],
     };
   },
   methods: {
@@ -47,12 +61,14 @@ export default {
     async fetchPosts() {
       try {
         this.isPostsLoading = true;
-        const response = await axios.get("https:jsonplaceholder.typicode.com/posts?_limit=10");
-        this.posts = response.data
+        const response = await axios.get(
+          "https:jsonplaceholder.typicode.com/posts?_limit=10"
+        );
+        this.posts = response.data;
       } catch (e) {
         console.log(e.message);
       } finally {
-		  this.isPostsLoading = false
+        this.isPostsLoading = false;
       }
     },
   },
@@ -60,6 +76,19 @@ export default {
   mounted() {
     this.fetchPosts();
   },
+
+  computed: {
+	  sortedPosts() {
+		  return [...this.posts].sort((post1,post2) => post1[this.selectedSort]?.localeCompare(post2[this.selectedSort]))
+	  }
+  },
+
+//   watch: {
+//     selectedSort(newValue) {
+// 		this.posts.sort((post1,post2) => post1[newValue]?.localeCompare(post2[newValue]))
+//     },
+//   },
+
 };
 </script>
 
@@ -72,6 +101,11 @@ export default {
 
 .app {
   padding: 20px;
+}
+
+.app__btns {
+  display: flex;
+  justify-content: space-between;
 }
 
 h1,

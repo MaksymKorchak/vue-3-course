@@ -13,7 +13,7 @@ export default {
 <style scoped>
 button {
   cursor: pointer;
-  width: 150px;
+  max-width: 150px;
   padding: 10px;
   outline: none;
   border: 2px solid teal;

@@ -31,6 +31,4 @@ export default {
   border: 2px solid teal;
 }
 
-.post-actions {
-}
 </style>
