@@ -1,24 +1,16 @@
 <template>
   <div>
-    <h1>{{ $store.state.isAuth ? 'Authorised !' : 'Not Authorised!' }}</h1>
-    <h1>Store Likes ___ {{ $store.state.likes }}</h1>
-    <div>
-      <my-button @click="$store.commit('incrementLikes')"
-        >Increment Likes</my-button
-      >
-      <my-button @click="$store.commit('decrementLikes')"
-        >Decrement Likes</my-button
-      >
-    </div>
+    <h1>Page with posts (using Store)</h1>
     <my-input
       v-focus
-      v-model="searchQuery"
+      :model-value="searchQuery"
+      @update:model-value="setSearchQuery"
       placeholder="Search by ..."
       style="margin-bottom: 15px"
     />
     <div class="app__btns">
       <my-button @click="showDialog">Create new Post</my-button>
-      <my-select v-model="selectedSort" :options="sortOptions" />
+      <my-select model:value="selectedSort" @update:model-value="setSelectedSort" :options="sortOptions" />
     </div>
     <my-dialog v-model:showModal="modalVisible">
       <post-form @create="createPost" />
@@ -31,10 +23,7 @@
     <h3 v-else>Loading ...</h3>
     <div v-intersection="loadMorePosts" class="observer"></div>
 
-    <!-- Page pagination for clicking -->
-    <!-- <div class="page__wrapper">
-		<my-pagination-item :totalPages="totalPages" :page="page" @changePage="changePage"/>
-    </div> -->
+
   </div>
 </template>
 
@@ -44,6 +33,7 @@ import PostList from "../components/PostList.vue";
 import MyButton from "../components/UI/MyButton.vue";
 import axios from "axios";
 import MyPaginationItem from "../components/UI/MyPaginationItem.vue";
+import { mapState, mapActions, mapGetters, mapMutations } from "vuex";
 
 export default {
   components: {
@@ -55,27 +45,19 @@ export default {
 
   data() {
     return {
-      posts: [],
       modalVisible: false,
-      isPostsLoading: false,
-      selectedSort: "",
-      searchQuery: "",
-      page: 1,
-      limit: 10,
-      totalPages: 1,
-      sortOptions: [
-        {
-          value: "title",
-          name: "By name",
-        },
-        {
-          value: "body",
-          name: "By description",
-        },
-      ],
     };
   },
   methods: {
+    ...mapMutations({
+       setPage: 'post/setPage',
+       setSearchQuery: 'post/setSearchQuery',
+       setSelectedSort: 'post/setSelectedSort'
+    }),
+    ...mapActions({
+      loadMorePosts: 'post/loadMorePosts',
+      fetchPosts: 'post/fetchPosts'
+    }),
     createPost(post) {
       this.posts.push(post);
       this.modalVisible = false;
@@ -88,78 +70,30 @@ export default {
     showDialog() {
       this.modalVisible = true;
     },
-
-    async fetchPosts() {
-      try {
-        this.isPostsLoading = true;
-        const response = await axios.get(
-          "https:jsonplaceholder.typicode.com/posts",
-          {
-            params: {
-              _page: this.page,
-              _limit: this.limit,
-            },
-          }
-        );
-        this.totalPages = Math.ceil(
-          response.headers["x-total-count"] / this.limit
-        );
-        this.posts = response.data;
-      } catch (e) {
-        console.log(e.message);
-      } finally {
-        this.isPostsLoading = false;
-      }
-    },
-
-    async loadMorePosts() {
-      try {
-        this.page += 1;
-        const response = await axios.get(
-          "https:jsonplaceholder.typicode.com/posts",
-          {
-            params: {
-              _page: this.page,
-              _limit: this.limit,
-            },
-          }
-        );
-        this.totalPages = Math.ceil(
-          response.headers["x-total-count"] / this.limit
-        );
-        this.posts = [...this.posts, ...response.data];
-      } catch (e) {
-        console.log(e.message);
-      }
-    },
-
-    // changePage(pageNumber) {
-    //   this.page = pageNumber;
-    // },
   },
 
   mounted() {
-    this.fetchPosts();
+      this.fetchPosts();
   },
 
   computed: {
-    sortedPosts() {
-      return [...this.posts].sort((post1, post2) =>
-        post1[this.selectedSort]?.localeCompare(post2[this.selectedSort])
-      );
-    },
-    sortedAndSearchedPosts() {
-      return this.sortedPosts.filter((post) =>
-        post.title.toLowerCase().includes(this.searchQuery.toLowerCase())
-      );
-    },
+    ...mapState({
+      posts: (state) => state.post.posts,
+      isPostsLoading: (state) => state.post.isPostsLoading,
+      selectedSort: (state) => state.post.selectedSort,
+      searchQuery: (state) => state.post.searchQuery,
+      page: (state) => state.post.page,
+      limit: (state) => state.post.limit,
+      totalPages: (state) => state.post.totalPages,
+      sortOptions: (state) => state.post.sortOptions,
+    }),
+    ...mapGetters({
+      sortedPosts: 'post/sortedPosts',
+      sortedAndSearchedPosts: 'post/sortedAndSearchedPosts'
+    }),
   },
 
-  watch: {
-    // page() {
-    //   this.fetchPosts();
-    // },
-  },
+  watch: {},
 };
 </script>
 

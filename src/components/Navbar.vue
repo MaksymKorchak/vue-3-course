@@ -5,6 +5,7 @@
       <router-link to="/posts"><my-button>Posts</my-button></router-link>
       <router-link to="/about"> <my-button>About</my-button></router-link>
       <router-link to="/store"> <my-button>Store</my-button></router-link>
+      <router-link to="/composition"> <my-button>Composition</my-button></router-link>
     </div>
   </div>
 </template>
