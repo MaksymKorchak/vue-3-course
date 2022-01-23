@@ -2,6 +2,7 @@
   <div>
     <h1>Page with posts</h1>
     <my-input
+      v-focus
       v-model="searchQuery"
       placeholder="Search by ..."
       style="margin-bottom: 15px"
@@ -19,7 +20,7 @@
       @remove="removePost"
     />
     <h3 v-else>Loading ...</h3>
-    <div ref="observer" class="observer"></div>
+    <div v-intersection="loadMorePosts" class="observer"></div>
 
     <!-- Page pagination for clicking -->
     <!-- <div class="page__wrapper">
@@ -130,21 +131,6 @@ export default {
 
   mounted() {
     this.fetchPosts();
-
-    //Dynamic pagination.
-    const options = {
-      rootMargin: "0px",
-      threshold: 1.0,
-    };
-
-    const callback = (entries, observer) => {
-      if (entries[0].isIntersecting && this.page < this.totalPages) {
-        this.loadMorePosts();
-      }
-    };
-
-    const observer = new IntersectionObserver(callback, options);
-    observer.observe(this.$refs.observer);
   },
 
   computed: {

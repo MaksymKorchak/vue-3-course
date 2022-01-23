@@ -2,6 +2,7 @@
   <form @submit.prevent>
     <h4>Create Post</h4>
     <my-input
+      v-focus
       v-model="post.title"
       type="text"
       placeholder="Post name ..."
@@ -48,5 +49,4 @@ form {
   flex-direction: column;
   gap: 15px;
 }
-
 </style>
